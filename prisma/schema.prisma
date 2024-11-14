@@ -9,21 +9,16 @@ datasource db {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model user_roles {
-  userid            String              @id @default("0")
-  ismaster          Boolean?            @default(false)
-  course_enrollment course_enrollment[]
-
-  @@map("user-roles")
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model course {
   id                Int                 @id @default(autoincrement())
   title             String?
-  lessons           Int?                @db.SmallInt
+  nooflessons       Int?                @db.SmallInt
   created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  author            String?
+  user_roles        user_roles?         @relation(fields: [author], references: [userid], onDelete: NoAction, onUpdate: NoAction)
   course_enrollment course_enrollment[]
+  lesson_enrollment lesson_enrollment[]
+  lessons           lessons[]
 }
 
 model course_enrollment {
@@ -35,4 +30,101 @@ model course_enrollment {
   progress          Int?        @default(0) @db.SmallInt
   course            course?     @relation(fields: [course_id], references: [id], onDelete: Cascade)
   user_roles        user_roles? @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model lesson_enrollment {
+  id          Int         @id @default(autoincrement())
+  created_at  DateTime    @default(now()) @db.Timestamptz(6)
+  user_id     String?
+  lesson_id   Int?
+  iscompleted Boolean?    @default(false)
+  course_id   Int?
+  course      course?     @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  lessons     lessons?    @relation(fields: [lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_roles  user_roles? @relation(fields: [user_id], references: [userid], onDelete: Cascade)
+}
+
+model lessons {
+  id                Int                 @id @default(autoincrement())
+  created_at        DateTime            @default(now()) @db.Timestamptz(6)
+  course_id         Int?
+  title             String?
+  description       String?
+  lesson_enrollment lesson_enrollment[]
+  course            course?             @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quiz              quiz[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model options {
+  id                  Int                   @id @default(autoincrement())
+  question_id         Int?
+  iscorrect           Boolean?              @default(false)
+  value               String?
+  quiz_question       quiz_question?        @relation(fields: [question_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  question_submission question_submission[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model question_submission {
+  id            Int            @id @default(autoincrement())
+  created_at    DateTime       @default(now()) @db.Timestamptz(6)
+  question_id   Int?
+  option_chose  Int?
+  userid        String?
+  options       options?       @relation(fields: [option_chose], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quiz_question quiz_question? @relation(fields: [question_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_roles    user_roles?    @relation(fields: [userid], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model quiz {
+  id              Int               @id @default(autoincrement())
+  created_at      DateTime          @default(now()) @db.Timestamptz(6)
+  lesson_id       Int?
+  questions       Int?              @default(0) @db.SmallInt
+  title           String?
+  lessons         lessons?          @relation(fields: [lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quiz_question   quiz_question[]
+  quiz_submission quiz_submission[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model quiz_question {
+  id                  Int                   @id @default(autoincrement()) @db.SmallInt
+  created_at          DateTime              @default(now()) @db.Timestamptz(6)
+  quiz_id             Int?
+  value               String?               @default("")
+  opt1                String?
+  opt2                String?
+  opt3                String?
+  opt4                String?
+  answer              Int?                  @db.SmallInt
+  options             options[]
+  question_submission question_submission[]
+  quiz                quiz?                 @relation(fields: [quiz_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model quiz_submission {
+  id         Int         @id @default(autoincrement())
+  created_at DateTime    @default(now()) @db.Timestamptz(6)
+  user_id    String?
+  quiz_id    Int?
+  quiz       quiz?       @relation(fields: [quiz_id], references: [id], onDelete: Cascade)
+  user_roles user_roles? @relation(fields: [user_id], references: [userid], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_roles {
+  userid              String                @id @default("0")
+  ismaster            Boolean?              @default(false)
+  username            String?
+  course              course[]
+  course_enrollment   course_enrollment[]
+  lesson_enrollment   lesson_enrollment[]
+  question_submission question_submission[]
+  quiz_submission     quiz_submission[]
+
+  @@map("user-roles")
 }

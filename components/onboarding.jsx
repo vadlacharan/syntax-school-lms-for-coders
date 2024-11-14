@@ -6,11 +6,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { GraduationCap, BookOpen, ChevronRight } from "lucide-react"
+import { useRouter } from 'next/navigation'
 import * as React from "react"
 
 
 
 export function Onboarding({ setProgress }) {
+  const router = useRouter()
   const [userType, setUserType] = useState()
   const [error, setError]= useState("")
   const [button,setButton] = useState(false)
@@ -31,7 +33,10 @@ export function Onboarding({ setProgress }) {
         },
         body: JSON.stringify(Data), 
       }).then(response => response.json()).then(response => { setError(response.error)})
+
+      router.push("/")
     }
+
     
   }
 

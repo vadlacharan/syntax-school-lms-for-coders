@@ -4,33 +4,27 @@ import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart3, Code2, Bell, BookOpen, User, LogOut } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+
 import { SignedIn, UserButton } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
-
 // Mock data for enrolled courses
-
 
 export default function UserDashboard() {
   const [activeNavItem, setActiveNavItem] = useState('dashboard')
   const [ enrolledcourses, setEnrolledCourses] = useState([])
+  const [Loading, setLoading] = useState(true)
 
   useEffect( () => {
     
     const fetchData = async () => {
+      setLoading(true)
       const response = await fetch('/api/user/enrolledcourses')
       .then( response => response.json())
       .then( response => setEnrolledCourses(response.enrolledcourses))
+      
 
     }
     fetchData()
+    setLoading(false)
     
     
     
@@ -78,12 +72,18 @@ export default function UserDashboard() {
          </SignedIn>
         </nav>
       </header>
+
       <main className="flex-1 py-6 px-4 md:px-6">
+
         <h1 className="text-2xl font-bold mb-6">Welcome back</h1>
         <section>
           <h2 className="text-xl font-semibold mb-4">Your Enrolled Courses</h2>
+        
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            
             {enrolledcourses.map((enrolledcourse) => (
+
+              Loading?<p>Loading Course...</p>:
               <Card key={enrolledcourse.course.id}>
                 <CardHeader>
                   <CardTitle>{enrolledcourse.course.title}</CardTitle>
@@ -102,7 +102,7 @@ export default function UserDashboard() {
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Link href="/user/course/1">
+                <Link href={`course/${enrolledcourse.course.id}`}>
                   <Button className="w-full">
                     <BookOpen className="w-4 h-4 mr-2" />
                     Continue Learning

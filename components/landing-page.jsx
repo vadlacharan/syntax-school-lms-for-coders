@@ -6,8 +6,29 @@ import { Code2, BookOpen, BarChart3 } from "lucide-react"
 import Link from "next/link"
 import { ModeToggle } from "./mode-toggle"
 import { SignedIn, SignedOut, SignInButton, SignOutButton } from "@clerk/nextjs"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+
+
+
 
 export function LandingPageComponent() {
+  const router= useRouter()
+  useEffect(() => {
+
+   const FetchUserType = async () => {
+      const user = await fetch('/api/user/onboarding')
+      .then(response =>  response.json())
+      .then( response => {
+        router.push(response.path)})
+
+    } 
+    FetchUserType()
+
+
+  },[])
+
+
   return (
     (<div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center">
@@ -123,9 +144,7 @@ export function LandingPageComponent() {
                <SignedOut>
                <SignInButton />
                </SignedOut>
-               <SignedIn>
-                  <Button>Continue to Dashboard</Button>
-               </SignedIn>
+              
             </div>
           </div>
         </section>
