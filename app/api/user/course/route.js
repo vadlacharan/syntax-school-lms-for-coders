@@ -9,6 +9,15 @@ export async function GET(req,res){
     
     const user = await currentUser()
 
+    const coursename = await prisma.course.findUnique({
+        where:{
+            id: CourseId
+        },
+        select: {
+            title: true
+        }
+    })
+
     const enrollement = await prisma.course_enrollment.findMany({
         where:{
             userid: user.id,
@@ -30,7 +39,7 @@ export async function GET(req,res){
             },
             include: {
                 lessons: true,
-                course: true
+              
             }
         })
         
@@ -45,7 +54,7 @@ export async function GET(req,res){
 
         })
     
-        return NextResponse.json({"lessons": lessons, "quizzes": quizzes})
+        return NextResponse.json({"lessons": lessons, "quizzes": quizzes, "coursename": coursename})
 
     }else{
         return NextResponse.json({status: 401})

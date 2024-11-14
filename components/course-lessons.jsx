@@ -16,6 +16,7 @@ export function CourseLessonsComponent() {
   const params  = useParams()
   const [Lessons, setLessons] = useState([])
   const [quizzes, setQuizzes] = useState([])
+  const [coursename, setCoursename] = useState("")
 
   
   const completedLessons = Lessons?.filter(Lesson => Lesson.iscompleted).length
@@ -30,12 +31,11 @@ export function CourseLessonsComponent() {
       setLessons(course.lessons)
       setStatus(course?.status)
       setQuizzes(course.quizzes)
-
+      setCoursename(course.coursename.title)
       console.log(course)
-      
     }
      FetchCourse()
-
+    
 
 
   },[])
@@ -46,7 +46,7 @@ export function CourseLessonsComponent() {
       <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold">{Lessons[0]?.course.title}</CardTitle>
+            <CardTitle className="text-3xl font-bold">{coursename}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-2">
@@ -81,6 +81,7 @@ export function CourseLessonsComponent() {
                   <CardHeader>
                     <CardTitle>{lesson.lessons.title}</CardTitle>
                   </CardHeader>
+                    
                     
                    <CardContent className="space-y-4">
                     
