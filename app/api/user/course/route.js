@@ -53,8 +53,26 @@ export async function GET(req,res){
             }
 
         })
+
+        const transformedData = {
+            lessons: lessons.map(lesson => ({
+              lesson: {
+                title: lesson.lessons.title,
+                quizzes: quizzes
+                  .filter(quiz => quiz.lesson_id === lesson.lesson_id) // Match quizzes by lesson_id
+                  .map(quiz => ({
+                    quiz: { title: quiz.title || "Untitled Quiz" } // Handle null titles
+                  }))
+              }
+            }))
+          };
+          
+          
+
+
+
     
-        return NextResponse.json({"lessons": lessons, "quizzes": quizzes, "coursename": coursename})
+        return NextResponse.json({"lessons": transformedData, "coursename": coursename})
 
     }else{
         return NextResponse.json({status: 401})
